@@ -30,7 +30,6 @@ public class BaseTest {
         options.setDeviceName(System.getProperty("device.name", "Android Emulator"));
         options.setAutoGrantPermissions(true);
         options.setNoReset(true);
-        options.setAppWaitActivity("*");
         options.setNewCommandTimeout(Duration.ofSeconds(120));
         options.setAdbExecTimeout(Duration.ofSeconds(120));
         options.setUiautomator2ServerInstallTimeout(Duration.ofSeconds(120));
@@ -48,12 +47,12 @@ public class BaseTest {
         }
 
         if (appPath != null && new File(appPath).exists()) {
-            System.out.println("Installing and launching APK: " + appPath);
+            System.out.println("Installing and launching custom APK: " + appPath);
             options.setApp(appPath);
         } else {
-            System.out.println("No custom APK found in apps/ directory. Testing Android System UI.");
+            System.out.println("No custom APK found in apps/ directory. Testing Android Settings app.");
             options.setAppPackage("com.android.settings");
-            options.setAppActivity("com.android.settings.Settings");
+            // Do not hardcode appActivity; let UiAutomator2 resolve the default launch intent
         }
 
         // Appium Server URL
