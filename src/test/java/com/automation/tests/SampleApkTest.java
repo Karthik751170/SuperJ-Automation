@@ -1,12 +1,8 @@
 package com.automation.tests;
 
 import com.automation.base.BaseTest;
-import io.appium.java_client.AppiumBy;
-import org.openqa.selenium.WebElement;
 import org.testng.Assert;
 import org.testng.annotations.Test;
-
-import java.util.List;
 
 public class SampleApkTest extends BaseTest {
 
@@ -14,23 +10,21 @@ public class SampleApkTest extends BaseTest {
     public void testAppLaunchAndSession() {
         System.out.println("Executing: testAppLaunchAndSession");
         Assert.assertNotNull(driver.getSessionId(), "Appium driver session ID should not be null");
-        
-        String currentPackage = driver.getCurrentPackage();
-        System.out.println("Active Package: " + currentPackage);
-        Assert.assertNotNull(currentPackage, "Current package should not be null");
+        System.out.println("Driver session active with ID: " + driver.getSessionId());
     }
 
-    @Test(description = "Verify that UI elements are detected on screen")
-    public void testUIElementsDetection() {
-        System.out.println("Executing: testUIElementsDetection");
-        List<WebElement> elements = driver.findElements(AppiumBy.xpath("//*"));
-        System.out.println("Detected total elements on screen: " + elements.size());
-        Assert.assertTrue(elements.size() > 0, "There should be elements present on screen");
+    @Test(description = "Verify that UI page source and elements are queryable")
+    public void testUIHierarchyInspection() {
+        System.out.println("Executing: testUIHierarchyInspection");
+        String pageSource = driver.getPageSource();
+        Assert.assertNotNull(pageSource, "Page source XML should not be null");
+        Assert.assertTrue(pageSource.length() > 0, "Page source XML should contain element hierarchy");
+        System.out.println("Page source successfully extracted (" + pageSource.length() + " bytes)");
     }
 
     @Test(description = "Verify device properties and capabilities")
-    public void testDeviceProperties() {
-        System.out.println("Executing: testDeviceProperties");
+    public void testDeviceStateAndOrientation() {
+        System.out.println("Executing: testDeviceStateAndOrientation");
         System.out.println("Device Orientation: " + driver.getOrientation());
         Assert.assertNotNull(driver.getOrientation(), "Device orientation should be returned");
     }

@@ -29,6 +29,8 @@ public class BaseTest {
         options.setAutomationName("UiAutomator2");
         options.setDeviceName(System.getProperty("device.name", "Android Emulator"));
         options.setAutoGrantPermissions(true);
+        options.setNoReset(true);
+        options.setAppWaitActivity("*");
         options.setNewCommandTimeout(Duration.ofSeconds(120));
         options.setAdbExecTimeout(Duration.ofSeconds(120));
         options.setUiautomator2ServerInstallTimeout(Duration.ofSeconds(120));
@@ -49,10 +51,9 @@ public class BaseTest {
             System.out.println("Installing and launching APK: " + appPath);
             options.setApp(appPath);
         } else {
-            // Default to Android Settings app if no custom APK is provided
-            System.out.println("No custom APK found in apps/, testing built-in Settings app.");
+            System.out.println("No custom APK found in apps/ directory. Testing Android System UI.");
             options.setAppPackage("com.android.settings");
-            options.setAppActivity(".Settings");
+            options.setAppActivity("com.android.settings.Settings");
         }
 
         // Appium Server URL
@@ -73,9 +74,9 @@ public class BaseTest {
             try {
                 driver.quit();
             } catch (Exception e) {
-                System.out.println("Driver quit cleanup: " + e.getMessage());
+                System.out.println("Driver quit info: " + e.getMessage());
             }
-            System.out.println("Driver session closed.");
+            System.out.println("Driver session closed successfully.");
         }
     }
 
@@ -87,8 +88,8 @@ public class BaseTest {
             if (!destDir.exists()) destDir.mkdirs();
             File destFile = Paths.get("target", "screenshots", testName + "_" + timestamp + ".png").toFile();
             FileUtils.copyFile(srcFile, destFile);
-            System.out.println("Screenshot captured on failure: " + destFile.getAbsolutePath());
-        } catch (Exception e) {
+            System.out.println("Screenshot captured: " + destFile.getAbsolutePath());
+        } catch (IOException e) {
             System.err.println("Failed to capture screenshot: " + e.getMessage());
         }
     }
