@@ -1,0 +1,5 @@
+# Force GitHub to recognize this as a pure Java project
+*.java linguist-detectable=true
+*.xml linguist-detectable=false
+*.yml linguist-detectable=false
+*.md linguist-detectable=false
