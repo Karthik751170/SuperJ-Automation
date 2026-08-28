@@ -29,12 +29,12 @@ public class BaseTest {
         options.setAutomationName("UiAutomator2");
         options.setDeviceName(System.getProperty("device.name", "Android Emulator"));
         options.setAutoGrantPermissions(true);
-        options.setNoReset(true);
+        options.setAppWaitActivity("*");
         options.setNewCommandTimeout(Duration.ofSeconds(120));
         options.setAdbExecTimeout(Duration.ofSeconds(120));
         options.setUiautomator2ServerInstallTimeout(Duration.ofSeconds(120));
 
-        // Check if an APK file is present in apps/ directory
+        // Find APK in apps/ directory
         String appPath = System.getProperty("app.path");
         if (appPath == null || appPath.isEmpty()) {
             File appsDir = new File("apps");
@@ -47,19 +47,19 @@ public class BaseTest {
         }
 
         if (appPath != null && new File(appPath).exists()) {
-            System.out.println("Installing and launching custom APK: " + appPath);
+            System.out.println("Installing and launching target APK: " + appPath);
             options.setApp(appPath);
         } else {
-            System.out.println("No custom APK found in apps/ directory. Testing Android Settings app.");
+            System.out.println("No APK found in apps/ directory, launching Android Settings app.");
             options.setAppPackage("com.android.settings");
-            // Do not hardcode appActivity; let UiAutomator2 resolve the default launch intent
+            options.setAppActivity(".Settings");
         }
 
         // Appium Server URL
         String appiumUrl = System.getProperty("appium.url", "http://127.0.0.1:4723");
         URL serverUrl = URI.create(appiumUrl).toURL();
 
-        System.out.println("Connecting to Appium at: " + serverUrl);
+        System.out.println("Connecting to Appium Server at: " + serverUrl);
         driver = new AndroidDriver(serverUrl, options);
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(15));
     }
@@ -73,9 +73,9 @@ public class BaseTest {
             try {
                 driver.quit();
             } catch (Exception e) {
-                System.out.println("Driver quit info: " + e.getMessage());
+                System.out.println("Driver cleanup: " + e.getMessage());
             }
-            System.out.println("Driver session closed successfully.");
+            System.out.println("Driver session closed.");
         }
     }
 
