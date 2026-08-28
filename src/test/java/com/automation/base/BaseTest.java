@@ -29,12 +29,13 @@ public class BaseTest {
         options.setAutomationName("UiAutomator2");
         options.setDeviceName(System.getProperty("device.name", "Android Emulator"));
         options.setAutoGrantPermissions(true);
-        options.setNewCommandTimeout(Duration.ofSeconds(60));
+        options.setNewCommandTimeout(Duration.ofSeconds(120));
+        options.setAdbExecTimeout(Duration.ofSeconds(120));
+        options.setUiautomator2ServerInstallTimeout(Duration.ofSeconds(120));
 
-        // Check if an APK file path is supplied via System Property or environment variable
+        // Check if an APK file is present in apps/ directory
         String appPath = System.getProperty("app.path");
         if (appPath == null || appPath.isEmpty()) {
-            // Check default apps/ directory
             File appsDir = new File("apps");
             if (appsDir.exists() && appsDir.isDirectory()) {
                 File[] apkFiles = appsDir.listFiles((dir, name) -> name.toLowerCase().endsWith(".apk"));
@@ -48,29 +49,32 @@ public class BaseTest {
             System.out.println("Installing and launching APK: " + appPath);
             options.setApp(appPath);
         } else {
-            // Default to Android Settings app for test baseline if no custom APK is placed yet
-            System.out.println("No APK found in apps/ folder, launching Android Settings app as baseline.");
+            // Default to Android Settings app if no custom APK is provided
+            System.out.println("No custom APK found in apps/, testing built-in Settings app.");
             options.setAppPackage("com.android.settings");
             options.setAppActivity(".Settings");
         }
 
-        // Appium Server URL (GitHub Actions or local)
+        // Appium Server URL
         String appiumUrl = System.getProperty("appium.url", "http://127.0.0.1:4723");
         URL serverUrl = URI.create(appiumUrl).toURL();
 
-        System.out.println("Connecting to Appium Server at: " + serverUrl);
+        System.out.println("Connecting to Appium at: " + serverUrl);
         driver = new AndroidDriver(serverUrl, options);
-        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+        driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(15));
     }
 
     @AfterMethod
     public void tearDown(ITestResult result) {
         if (driver != null) {
-            // Capture screenshot if test failed
             if (result.getStatus() == ITestResult.FAILURE) {
                 captureScreenshot(result.getName());
             }
-            driver.quit();
+            try {
+                driver.quit();
+            } catch (Exception e) {
+                System.out.println("Driver quit cleanup: " + e.getMessage());
+            }
             System.out.println("Driver session closed.");
         }
     }
@@ -79,10 +83,12 @@ public class BaseTest {
         try {
             File srcFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
             String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+            File destDir = new File("target/screenshots");
+            if (!destDir.exists()) destDir.mkdirs();
             File destFile = Paths.get("target", "screenshots", testName + "_" + timestamp + ".png").toFile();
             FileUtils.copyFile(srcFile, destFile);
             System.out.println("Screenshot captured on failure: " + destFile.getAbsolutePath());
-        } catch (IOException e) {
+        } catch (Exception e) {
             System.err.println("Failed to capture screenshot: " + e.getMessage());
         }
     }
