@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AURA Admin Payment Tracking Panel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;450;600;800;900&family=Space+Grotesk:wght@500;700&display=swap');
+    body {
+      font-family: 'Inter', sans-serif;
+    }
+    .heading-font {
+      font-family: 'Space Grotesk', sans-serif;
+    }
+  </style>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            slate: {
+              850: '#1e293b/60',
+              950: '#070a13'
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-[#05060a] text-slate-100 min-h-screen flex flex-col justify-between overflow-x-hidden relative">
+
+  <!-- Background Glowing Orbs -->
+  <div class="absolute top-0 left-0 w-96 h-96 bg-emerald-500/5 rounded-full blur-[120px] pointer-events-none"></div>
+  <div class="absolute bottom-0 right-0 w-96 h-96 bg-teal-500/5 rounded-full blur-[120px] pointer-events-none"></div>
+
+  <!-- MAIN APP CONTAINER -->
+  <div class="flex-1 flex flex-col z-10">
+
+    <!-- HEADER (Visible when logged in) -->
+    <header id="app-header" class="hidden bg-slate-950/40 border-b border-slate-900 px-8 py-5 flex items-center justify-between sticky top-0 backdrop-blur-md">
+      <div class="flex items-center gap-3.5">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 via-teal-500 to-cyan-550 flex items-center justify-center shadow-lg shadow-emerald-500/10">
+          <i data-lucide="shield-check" class="w-5 h-5 text-white"></i>
+        </div>
+        <div>
+          <h1 class="text-sm font-black tracking-widest text-white uppercase font-mono heading-font">AURA ADMIN PANEL</h1>
+          <p class="text-[10px] text-slate-400 mt-0.5 tracking-wider uppercase font-mono">Payment Auditing & User Tracking Terminal</p>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <div class="bg-emerald-950/40 border border-emerald-900/30 rounded-xl px-4 py-1.5 flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+          <span class="text-[10px] font-bold text-emerald-400 uppercase font-mono tracking-wider">Audit logs synced</span>
+        </div>
+        <button onclick="logoutAdmin()" class="flex items-center justify-center w-10 h-10 rounded-xl bg-slate-950/60 hover:bg-rose-950/20 border border-slate-850 hover:border-rose-900/30 text-slate-455 hover:text-rose-450 transition shadow">
+          <i data-lucide="log-out" class="w-4.5 h-4.5"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- VIEW 1: LOGIN (Default) -->
+    <div id="login-view" class="flex-1 flex items-center justify-center p-6">
+      <div class="w-full max-w-[400px] bg-slate-950/40 border border-slate-900/80 backdrop-blur-3xl rounded-2xl p-8 shadow-2xl space-y-6">
+        
+        <div class="text-center space-y-2">
+          <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-emerald-500 via-teal-500 to-cyan-550 flex items-center justify-center mx-auto shadow-lg shadow-emerald-500/10">
+            <i data-lucide="shield-check" class="w-5 h-5 text-white"></i>
+          </div>
+          <h2 class="text-xl font-bold tracking-tight text-white heading-font">Admin Panel Login</h2>
+          <p class="text-xs text-slate-400">Authenticate with admin privileges to track user payments.</p>
+        </div>
+
+        <div id="login-error" class="hidden bg-rose-950/20 border border-rose-900/30 text-rose-350 text-xs p-3.5 rounded-xl flex items-center gap-2">
+          <i data-lucide="alert-circle" class="w-4 h-4 flex-shrink-0"></i>
+          <span id="login-error-text">Unauthorized account access.</span>
+        </div>
+
+        <form onsubmit="loginAdmin(event)" class="space-y-4">
+          <div>
+            <label class="block text-[10px] font-bold text-slate-450 mb-1.5 uppercase font-mono tracking-wider">Admin Email</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500">
+                <i data-lucide="mail" class="w-4 h-4"></i>
+              </span>
+              <input type="email" id="login-email" required placeholder="admin@aura.com" class="w-full bg-slate-950/60 border border-slate-850 focus:border-emerald-500 rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-slate-100 focus:outline-none transition">
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-[10px] font-bold text-slate-450 mb-1.5 uppercase font-mono tracking-wider">Password</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center text-slate-500">
+                <i data-lucide="lock" class="w-4 h-4"></i>
+              </span>
+              <input type="password" id="login-password" required placeholder="••••••••" class="w-full bg-slate-950/60 border border-slate-850 focus:border-emerald-500 rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-slate-100 focus:outline-none transition">
+            </div>
+          </div>
+
+          <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs py-3 rounded-xl transition shadow flex items-center justify-center gap-1.5">
+            Authenticate Session
+            <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+          </button>
+        </form>
+      </div>
+    </div>
+
+    <!-- VIEW 2: DASHBOARD PANEL (Hidden initially) -->
+    <div id="dashboard-view" class="hidden flex-1 max-w-[1280px] w-full mx-auto p-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+      
+      <!-- Left side: Payments List (8 cols) -->
+      <section class="lg:col-span-8 flex flex-col gap-6">
+        <div class="bg-slate-950/20 border border-slate-900 backdrop-blur-2xl rounded-2xl p-6 shadow-2xl space-y-4">
+          <div class="flex items-center justify-between border-b border-slate-900/60 pb-4">
+            <div>
+              <h3 class="text-sm font-black text-slate-300 uppercase tracking-widest font-mono flex items-center gap-2 heading-font">
+                <i data-lucide="line-chart" class="w-4 h-4 text-emerald-400"></i>
+                Token Purchase Transactions Tracker
+              </h3>
+              <p class="text-xs text-slate-400 mt-1">Tracks all successful sales and credited tokens in real-time.</p>
+            </div>
+            <button onclick="loadAdminData()" class="flex items-center justify-center p-2 rounded-xl bg-slate-950/60 hover:bg-slate-900 border border-slate-850 hover:border-slate-850 text-slate-400 hover:text-white transition">
+              <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+            </button>
+          </div>
+
+          <div class="overflow-x-auto min-h-[350px]">
+            <table class="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr class="border-b border-slate-900/60 text-[10px] text-slate-500 uppercase font-mono tracking-wider">
+                  <th class="py-3 px-3">User Name</th>
+                  <th class="py-3 px-3">User Email</th>
+                  <th class="py-3 px-3">Transaction ID</th>
+                  <th class="py-3 px-3">Payment Mode</th>
+                  <th class="py-3 px-3 text-right">Price Paid</th>
+                  <th class="py-3 px-3 text-right">Tokens Credited</th>
+                  <th class="py-3 px-3 text-right">Date & Time</th>
+                </tr>
+              </thead>
+              <tbody id="payments-list-body">
+                <!-- Dynamically populated -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- Right side: Users balance audit ledger (4 cols) -->
+      <section class="lg:col-span-4 flex flex-col gap-6">
+        <div class="bg-slate-950/20 border border-slate-900 backdrop-blur-2xl rounded-2xl p-6 shadow-2xl space-y-4">
+          <div class="border-b border-slate-900 pb-3">
+            <h3 class="text-sm font-black text-slate-300 uppercase tracking-widest font-mono flex items-center gap-2 heading-font">
+              <i data-lucide="users" class="w-4 h-4 text-emerald-400"></i>
+              Registered Users List
+            </h3>
+            <p class="text-[10px] text-slate-450 mt-1">Audit active registered client profiles and current token balances.</p>
+          </div>
+
+          <div class="space-y-3 max-h-[500px] overflow-y-auto pr-1" id="users-list-container">
+            <!-- Dynamically populated -->
+          </div>
+        </div>
+      </section>
+
+    </div>
+
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="bg-slate-950/20 border-t border-slate-900/60 p-4 text-center z-10 text-[10.5px] text-slate-500 font-mono">
+    © 2026 AURA Lab. Running standalone admin audit node on Port 3001.
+  </footer>
+
+  <script>
+    let authToken = '';
+
+    // Check existing auth on load
+    window.onload = () => {
+      const savedToken = localStorage.getItem('admin_token');
+      if (savedToken) {
+        authToken = savedToken;
+        showDashboard();
+      }
+    };
+
+    // Authenticate Admin
+    async function loginAdmin(e) {
+      e.preventDefault();
+      const email = document.getElementById('login-email').value;
+      const password = document.getElementById('login-password').value;
+      const errorDiv = document.getElementById('login-error');
+      
+      errorDiv.classList.add('hidden');
+
+      if (!email.startsWith('admin@')) {
+        errorDiv.classList.remove('hidden');
+        document.getElementById('login-error-text').innerText = "Access Denied: Only accounts starting with 'admin@' can log in here.";
+        return;
+      }
+
+      try {
+        const response = await fetch('http://127.0.0.1:8000/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        const data = await response.json();
+
+        if (!response.ok) throw new Error(data.detail || "Authentication failed");
+
+        authToken = data.access_token;
+        localStorage.setItem('admin_token', authToken);
+        showDashboard();
+
+      } catch (err) {
+        errorDiv.classList.remove('hidden');
+        document.getElementById('login-error-text').innerText = err.message || "Failed to reach server.";
+      }
+    }
+
+    function logoutAdmin() {
+      localStorage.removeItem('admin_token');
+      authToken = '';
+      document.getElementById('app-header').classList.add('hidden');
+      document.getElementById('dashboard-view').classList.add('hidden');
+      document.getElementById('login-view').classList.remove('hidden');
+    }
+
+    function showDashboard() {
+      document.getElementById('login-view').classList.add('hidden');
+      document.getElementById('app-header').classList.remove('hidden');
+      document.getElementById('dashboard-view').classList.remove('hidden');
+      loadAdminData();
+    }
+
+    async function loadAdminData() {
+      try {
+        // 1. Fetch Payments list
+        const payRes = await fetch('http://127.0.0.1:8000/api/admin/payments', {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        if (!payRes.ok) throw new Error("Session expired. Log in again.");
+        const payments = await payRes.json();
+        renderPayments(payments);
+
+        // 2. Fetch Users list
+        const usersRes = await fetch('http://127.0.0.1:8000/api/admin/users', {
+          headers: { 'Authorization': `Bearer ${authToken}` }
+        });
+        if (usersRes.ok) {
+          const users = await usersRes.json();
+          renderUsers(users);
+        }
+
+      } catch (e) {
+        logoutAdmin();
+      }
+    }
+
+    function renderPayments(payments) {
+      const tbody = document.getElementById('payments-list-body');
+      tbody.innerHTML = '';
+
+      if (payments.length === 0) {
+        tbody.innerHTML = `
+          <tr>
+            <td colspan="7" class="py-16 text-center text-slate-500 italic text-[11px]">
+              No purchase transactions recorded in database.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      payments.forEach(p => {
+        const dateStr = p.created_at ? new Date(p.created_at).toLocaleString() : 'N/A';
+        const isEmulator = p.payment_method.includes('emulator');
+        
+        const row = `
+          <tr class="border-b border-slate-900/40 hover:bg-slate-900/10 font-mono text-[11px]">
+            <td class="py-3 px-3 font-sans text-slate-200 font-bold">${p.username || 'USER'}</td>
+            <td class="py-3 px-3 text-slate-450 font-sans">${p.email}</td>
+            <td class="py-3 px-3 text-slate-300 break-all select-all select-none flex items-center gap-1">
+              <i data-lucide="copy" class="w-3 h-3 text-slate-500 cursor-pointer hover:text-white" onclick="navigator.clipboard.writeText('${p.transaction_id}'); alert('Copied ID!')"></i>
+              ${p.transaction_id.substring(0, 15)}...
+            </td>
+            <td class="py-3 px-3">
+              <span class="px-2 py-0.5 rounded text-[9px] font-bold uppercase ${
+                isEmulator ? 'bg-amber-950/40 text-amber-400 border border-amber-900/20' : 'bg-emerald-950/40 text-emerald-400 border border-emerald-900/20'
+              }">
+                ${p.payment_method}
+              </span>
+            </td>
+            <td class="py-3 px-3 text-right font-sans text-white font-bold">₹${p.price}</td>
+            <td class="py-3 px-3 text-right text-emerald-400 font-black">+${p.amount} 🪙</td>
+            <td class="py-3 px-3 text-right text-slate-500 font-sans text-[10px]">${dateStr}</td>
+          </tr>
+        `;
+        tbody.insertAdjacentHTML('beforeend', row);
+      });
+      lucide.createIcons();
+    }
+
+    function renderUsers(users) {
+      const container = document.getElementById('users-list-container');
+      container.innerHTML = '';
+
+      if (users.length === 0) {
+        container.innerHTML = `<div class="text-center py-6 text-slate-550 text-[11px] italic">No registered users found.</div>`;
+        return;
+      }
+
+      users.forEach(u => {
+        const isAdmin = u.email.startsWith('admin@');
+        const regDate = u.created_at ? new Date(u.created_at).toLocaleDateString() : 'N/A';
+        const userCard = `
+          <div class="bg-slate-950/40 border border-slate-900 hover:border-slate-850 p-4 rounded-xl space-y-2">
+            <div class="flex justify-between items-start">
+              <div>
+                <span class="text-xs font-bold text-slate-200 block truncate max-w-[170px]">${u.email}</span>
+                <span class="text-[9px] font-mono text-slate-500 block mt-0.5 uppercase">${u.provider} User • Registered ${regDate}</span>
+              </div>
+              <div class="text-right">
+                <span class="text-[9px] text-slate-500 uppercase tracking-wider font-mono">Wallet Balance</span>
+                <span class="text-xs font-black text-white font-mono block mt-0.5">${u.tokens} 🪙</span>
+              </div>
+            </div>
+            ${isAdmin ? `
+              <span class="text-[8px] bg-indigo-950 text-indigo-400 border border-indigo-900 px-2 py-0.5 rounded uppercase font-mono block text-center font-black">Sys Administrator</span>
+            ` : ''}
+          </div>
+        `;
+        container.insertAdjacentHTML('beforeend', userCard);
+      });
+    }
+  </script>
+  <script>
+    lucide.createIcons();
+  </script>
+</body>
+</html>
