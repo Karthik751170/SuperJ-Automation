@@ -12,26 +12,26 @@
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <appium.java.client.version>9.4.0</appium.java.client.version>
-        <selenium.version>4.27.0</selenium.version>
+        <appium.java.client.version>9.3.0</appium.java.client.version>
+        <selenium.version>4.21.0</selenium.version>
         <testng.version>7.10.2</testng.version>
         <surefire.version>3.2.5</surefire.version>
         <commons.io.version>2.16.1</commons.io.version>
     </properties>
 
     <dependencies>
-        <!-- Appium Java Client (includes compatible Selenium dependencies) -->
-        <dependency>
-            <groupId>io.appium</groupId>
-            <artifactId>java-client</artifactId>
-            <version>${appium.java.client.version}</version>
-        </dependency>
-
-        <!-- Selenium Java (compatible with Appium 9.4.0) -->
+        <!-- Selenium Java (4.21.0 contains ContextAware and LocationContext) -->
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
             <artifactId>selenium-java</artifactId>
             <version>${selenium.version}</version>
+        </dependency>
+
+        <!-- Appium Java Client -->
+        <dependency>
+            <groupId>io.appium</groupId>
+            <artifactId>java-client</artifactId>
+            <version>${appium.java.client.version}</version>
         </dependency>
 
         <!-- TestNG -->
