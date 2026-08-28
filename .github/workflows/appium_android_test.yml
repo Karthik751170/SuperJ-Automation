@@ -5,13 +5,13 @@ on:
     branches: [ main, master ]
   pull_request:
     branches: [ main, master ]
-  workflow_dispatch: # Allows manual trigger from GitHub UI
+  workflow_dispatch:
 
 jobs:
   android-test:
     name: Run Android Appium Tests
-    runs-on: macos-13 # macOS runners on GitHub support hardware-accelerated Android emulators
-    timeout-minutes: 40
+    runs-on: macos-latest # Uses GitHub's latest fast M-series runner
+    timeout-minutes: 30
 
     steps:
       - name: Checkout Repository
@@ -40,7 +40,7 @@ jobs:
         run: |
           appium --port 4723 --log-level info --log appium.log &
           sleep 5
-          curl -s http://127.0.0.1:4723/status || echo "Waiting for Appium server..."
+          curl -s http://127.0.0.1:4723/status || echo "Appium started"
 
       - name: Gradle/Android Cache
         uses: actions/cache@v4
@@ -48,14 +48,14 @@ jobs:
           path: |
             ~/.android/avd/*
             ~/.android/adb*
-          key: avd-api-33
+          key: avd-api-30
 
       - name: Launch Android Emulator & Run Appium Tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 33
-          target: google_apis
-          arch: x86_64
+          api-level: 30
+          target: default
+          arch: arm64-v8a
           profile: pixel_4
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
